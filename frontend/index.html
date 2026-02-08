@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <h1 class="text-3xl font-bold">📚 Student Result Management System</h1>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-500 to-blue-700 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-5xl font-bold mb-4">Welcome to the Result Management System</h2>
+            <p class="text-xl text-blue-100 mb-8">Manage student results digitally with role-based access and secure login</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 py-16">
+        <!-- Features Section -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Key Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+                    <div class="text-4xl mb-4">🔐</div>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Role-Based Access</h3>
+                    <p class="text-gray-600">Secure login system with role-based permissions for students, teachers, and admins</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+                    <div class="text-4xl mb-4">📊</div>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Auto Result Calculation</h3>
+                    <p class="text-gray-600">Automatic calculation of total marks, percentage, grades, and pass/fail status</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition">
+                    <div class="text-4xl mb-4">💾</div>
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Database Storage</h3>
+                    <p class="text-gray-600">Secure database storage for all student data, marks, and academic records</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Section -->
+        <section class="bg-gray-100 rounded-lg p-12 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Quick Access</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Student Login -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-green-500 text-white p-6">
+                        <h3 class="text-2xl font-bold">👨‍🎓 Student</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-6">View your marks, percentage, grade, and result status</p>
+                        <a href="student_login.html" class="w-full block bg-green-500 text-white py-2 rounded-lg font-semibold text-center hover:bg-green-600 transition">
+                            Student Login
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Teacher Login -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-blue-500 text-white p-6">
+                        <h3 class="text-2xl font-bold">👨‍🏫 Teacher</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-6">Enter and update student marks for multiple subjects</p>
+                        <a href="teacher_login.html" class="w-full block bg-blue-500 text-white py-2 rounded-lg font-semibold text-center hover:bg-blue-600 transition">
+                            Teacher Login
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Admin Login -->
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div class="bg-red-500 text-white p-6">
+                        <h3 class="text-2xl font-bold">🛡️ Admin</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-6">Manage students, teachers, subjects, and view all results</p>
+                        <a href="admin_login.html" class="w-full block bg-red-500 text-white py-2 rounded-lg font-semibold text-center hover:bg-red-600 transition">
+                            Admin Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Credentials Section -->
+        <section class="bg-blue-50 border-l-4 border-blue-600 rounded-lg p-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">📝 Demo Credentials</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <p class="text-sm text-gray-600 font-semibold">Student</p>
+                    <p class="text-gray-800"><strong>Roll No:</strong> S001</p>
+                    <p class="text-gray-800"><strong>Password:</strong> pass123</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 font-semibold">Teacher</p>
+                    <p class="text-gray-800"><strong>ID:</strong> T001</p>
+                    <p class="text-gray-800"><strong>Password:</strong> pass123</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 font-semibold">Admin</p>
+                    <p class="text-gray-800"><strong>ID:</strong> admin1</p>
+                    <p class="text-gray-800"><strong>Password:</strong> admin123</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center py-6 mt-16">
+        <p>&copy; 2024 Student Result Management System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

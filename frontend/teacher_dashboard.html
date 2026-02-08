@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Result Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold">📚 RMS</a>
+                <div class="flex items-center space-x-4">
+                    <span id="teacherInfo" class="text-sm"></span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-semibold transition">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Teacher Info Card -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-8 mb-8">
+            <h1 class="text-3xl font-bold mb-2">Welcome, Teacher!</h1>
+            <p id="teacherName" class="text-lg text-blue-100">Loading...</p>
+            <p id="subjectInfo" class="text-sm text-blue-100">Subject: Loading...</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+            <div class="flex border-b border-gray-200">
+                <button onclick="showTab('enterMarks')" class="flex-1 px-6 py-4 font-semibold text-gray-700 hover:bg-gray-50 border-b-2 border-blue-600 bg-blue-50">
+                    ➕ Enter Marks
+                </button>
+                <button onclick="showTab('viewMarks')" class="flex-1 px-6 py-4 font-semibold text-gray-700 hover:bg-gray-50">
+                    👁️ View Marks
+                </button>
+            </div>
+
+            <!-- Enter Marks Tab -->
+            <div id="enterMarksTab" class="p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Enter Student Marks</h2>
+                
+                <form id="marksForm" class="space-y-6">
+                    <!-- Student Selection -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Select Student</label>
+                        <select id="studentSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">-- Please select a student --</option>
+                        </select>
+                    </div>
+
+                    <!-- Subject Selection -->
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Subject <span id="subjectMaxMarks" class="text-gray-500 text-sm">(Max: --)</span></label>
+                        <select id="subjectSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required onchange="updateMaxMarks()">
+                            <option value="">-- Please select a subject --</option>
+                        </select>
+                    </div>
+
+                    <!-- Marks Input -->
+                    <div>
+                        <label id="marksLabel" class="block text-gray-700 font-semibold mb-2">Marks Obtained (0 - Max Marks)</label>
+                        <input 
+                            type="number" 
+                            id="marksInput" 
+                            min="0" 
+                            max="200" 
+                            placeholder="Enter marks" 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        >
+                    </div>
+
+                    <!-- Messages -->
+                    <div id="formError" class="hidden p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm"></div>
+                    <div id="formSuccess" class="hidden p-3 bg-green-50 border border-green-200 rounded-lg text-green-600 text-sm"></div>
+
+                    <!-- Submit Button -->
+                    <button 
+                        type="submit" 
+                        class="w-full bg-blue-500 text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition"
+                    >
+                        Save Marks
+                    </button>
+                </form>
+            </div>
+
+            <!-- View Marks Tab -->
+            <div id="viewMarksTab" class="p-8 hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Saved Marks</h2>
+                
+                <div id="loadingMarks" class="text-center py-12">
+                    <div class="inline-block">
+                        <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                        <p class="mt-4 text-gray-600">Loading marks...</p>
+                    </div>
+                </div>
+
+                <div id="marksTableContainer" class="overflow-x-auto hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Roll No</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Student Name</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Subject</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Marks</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Max Marks</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTableBody" class="border-b border-gray-200">
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No marks found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variable to store subjects with their max marks
+        let subjectsData = {};
+
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const teacherId = localStorage.getItem('teacherId');
+            const teacherName = localStorage.getItem('teacherName');
+            const subject = localStorage.getItem('subject');
+
+            if (!teacherId) {
+                window.location.href = 'teacher_login.html';
+                return;
+            }
+
+            // Update header
+            document.getElementById('teacherInfo').textContent = `${teacherName}`;
+            document.getElementById('teacherName').textContent = teacherName;
+            document.getElementById('subjectInfo').textContent = `Subject: ${subject}`;
+
+            // Fetch data
+            fetchStudents();
+            fetchSubjects();
+            fetchTeacherMarks();
+        });
+
+        async function fetchStudents() {
+            try {
+                const response = await fetch('http://localhost:5000/api/teacher/students');
+                const data = await response.json();
+
+                if (data.success) {
+                    const select = document.getElementById('studentSelect');
+                    data.students.forEach(student => {
+                        const option = document.createElement('option');
+                        option.value = student.id;
+                        option.textContent = `${student.roll_no} - ${student.name}`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching students:', error);
+            }
+        }
+
+        async function fetchSubjects() {
+            try {
+                const response = await fetch('http://localhost:5000/api/subjects');
+                const data = await response.json();
+
+                if (data.success) {
+                    const select = document.getElementById('subjectSelect');
+                    data.subjects.forEach(subject => {
+                        const option = document.createElement('option');
+                        option.value = subject.id;
+                        option.textContent = subject.name;
+                        option.setAttribute('data-max-marks', subject.max_marks);
+                        select.appendChild(option);
+                        
+                        // Store in global object for easy access
+                        subjectsData[subject.id] = {
+                            name: subject.name,
+                            max_marks: subject.max_marks
+                        };
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching subjects:', error);
+            }
+        }
+
+        async function fetchTeacherMarks() {
+            try {
+                const teacherId = localStorage.getItem('teacherId');
+                const response = await fetch(`http://localhost:5000/api/teacher/marks/${teacherId}`);
+                const data = await response.json();
+
+                document.getElementById('loadingMarks').classList.add('hidden');
+
+                if (data.success && data.marks.length > 0) {
+                    const tableBody = document.getElementById('marksTableBody');
+                    tableBody.innerHTML = '';
+
+                    data.marks.forEach(mark => {
+                        const percentage = (mark.marks / mark.max_marks * 100).toFixed(2);
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-200 hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-800 font-medium">${mark.student_roll_no}</td>
+                            <td class="px-6 py-4 text-gray-600">${mark.student_name}</td>
+                            <td class="px-6 py-4 text-gray-600">${mark.subject}</td>
+                            <td class="px-6 py-4 text-gray-600 font-semibold">${mark.marks}</td>
+                            <td class="px-6 py-4 text-gray-600">${mark.max_marks}</td>
+                            <td class="px-6 py-4 text-gray-600 font-semibold">${percentage}%</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    document.getElementById('marksTableContainer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching marks:', error);
+                document.getElementById('loadingMarks').classList.add('hidden');
+            }
+        }
+
+        function updateMaxMarks() {
+            const subjectSelect = document.getElementById('subjectSelect');
+            const subjectId = subjectSelect.value;
+            const marksInput = document.getElementById('marksInput');
+            const marksLabel = document.getElementById('marksLabel');
+            const subjectMaxMarksSpan = document.getElementById('subjectMaxMarks');
+            
+            if (subjectId && subjectsData[subjectId]) {
+                const maxMarks = subjectsData[subjectId].max_marks;
+                marksInput.max = maxMarks;
+                marksLabel.textContent = `Marks Obtained (0 - ${maxMarks})`;
+                subjectMaxMarksSpan.textContent = `(Max: ${maxMarks})`;
+            } else {
+                marksInput.max = 200;
+                marksLabel.textContent = 'Marks Obtained (Select a subject first)';
+                subjectMaxMarksSpan.textContent = '(Max: --)';
+            }
+        }
+
+        document.getElementById('marksForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const studentId = document.getElementById('studentSelect').value;
+            const subjectId = document.getElementById('subjectSelect').value;
+            const marks = parseFloat(document.getElementById('marksInput').value);
+            const teacherId = localStorage.getItem('teacherId');
+
+            const errorDiv = document.getElementById('formError');
+            const successDiv = document.getElementById('formSuccess');
+
+            // Client-side validation
+            if (subjectsData[subjectId]) {
+                const maxMarks = subjectsData[subjectId].max_marks;
+                if (marks < 0 || marks > maxMarks) {
+                    errorDiv.textContent = `Marks must be between 0 and ${maxMarks}`;
+                    errorDiv.classList.remove('hidden');
+                    successDiv.classList.add('hidden');
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/teacher/enter-marks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        student_id: parseInt(studentId),
+                        teacher_id: parseInt(teacherId),
+                        subject_id: parseInt(subjectId),
+                        marks_obtained: marks
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    successDiv.textContent = 'Marks saved successfully!';
+                    successDiv.classList.remove('hidden');
+                    errorDiv.classList.add('hidden');
+                    
+                    document.getElementById('marksForm').reset();
+                    updateMaxMarks();
+                    
+                    setTimeout(() => {
+                        successDiv.classList.add('hidden');
+                        fetchTeacherMarks();
+                    }, 2000);
+                } else {
+                    errorDiv.textContent = data.message || 'Error saving marks.';
+                    errorDiv.classList.remove('hidden');
+                    successDiv.classList.add('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error connecting to server.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.getElementById('enterMarksTab').classList.add('hidden');
+            document.getElementById('viewMarksTab').classList.add('hidden');
+
+            // Remove active state from all buttons
+            document.querySelectorAll('[onclick*="showTab"]').forEach(btn => {
+                btn.classList.remove('bg-blue-50', 'border-b-2', 'border-blue-600');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+
+            // Add active state to clicked button
+            if (tabName === 'enterMarks') {
+                document.querySelectorAll('[onclick*="showTab"]')[0].classList.add('bg-blue-50', 'border-b-2', 'border-blue-600');
+            } else {
+                document.querySelectorAll('[onclick*="showTab"]')[1].classList.add('bg-blue-50', 'border-b-2', 'border-blue-600');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('teacherId');
+            localStorage.removeItem('teacherName');
+            localStorage.removeItem('subject');
+            window.location.href = 'teacher_login.html';
+        }
+    </script>
+</body>
+</html>

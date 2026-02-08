@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Result Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold">📚 RMS</a>
+                <div class="flex items-center space-x-4">
+                    <span id="adminInfo" class="text-sm"></span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-semibold transition">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Admin Info Card -->
+        <div class="bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg shadow-lg p-8 mb-8">
+            <h1 class="text-3xl font-bold mb-2">Admin Dashboard</h1>
+            <p id="adminName" class="text-lg text-red-100">Welcome, Admin!</p>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="flex border-b border-gray-200 flex-wrap">
+                <button onclick="showTab('students')" class="flex-1 px-4 py-4 font-semibold text-gray-700 hover:bg-gray-50 border-b-2 border-red-600 bg-red-50 text-sm">
+                    👨‍🎓 Students
+                </button>
+                <button onclick="showTab('teachers')" class="flex-1 px-4 py-4 font-semibold text-gray-700 hover:bg-gray-50 text-sm">
+                    👨‍🏫 Teachers
+                </button>
+                <button onclick="showTab('results')" class="flex-1 px-4 py-4 font-semibold text-gray-700 hover:bg-gray-50 text-sm">
+                    📊 Results
+                </button>
+                <button onclick="showTab('subjects')" class="flex-1 px-4 py-4 font-semibold text-gray-700 hover:bg-gray-50 text-sm">
+                    📚 Subjects
+                </button>
+            </div>
+
+            <!-- Students Tab -->
+            <div id="studentsTab" class="p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Manage Students</h2>
+                
+                <!-- Add Student Form -->
+                <div class="bg-gray-50 rounded-lg p-6 border border-gray-200 mb-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Add New Student</h3>
+                    <form id="addStudentForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="rollNo" placeholder="Roll No" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="text" id="studentName" placeholder="Full Name" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="text" id="className" placeholder="Class" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="email" id="studentEmail" placeholder="Email" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="password" id="studentPassword" placeholder="Password" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <button type="submit" class="bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition">Add Student</button>
+                    </form>
+                    <div id="studentFormMessage" class="mt-4 hidden p-3 rounded-lg text-sm"></div>
+                </div>
+
+                <!-- Students Table -->
+                <div id="studentLoadingMessage" class="text-center py-12">
+                    <div class="inline-block">
+                        <div class="animate-spin inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
+                        <p class="mt-4 text-gray-600">Loading students...</p>
+                    </div>
+                </div>
+
+                <div id="studentsTableContainer" class="overflow-x-auto hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Roll No</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Class</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody" class="border-b border-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No students found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Teachers Tab -->
+            <div id="teachersTab" class="p-8 hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Manage Teachers</h2>
+                
+                <!-- Add Teacher Form -->
+                <div class="bg-gray-50 rounded-lg p-6 border border-gray-200 mb-8">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Add New Teacher</h3>
+                    <form id="addTeacherForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <input type="text" id="teacherId" placeholder="Teacher ID" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="text" id="teacherName" placeholder="Full Name" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="text" id="subject" placeholder="Subject" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="email" id="teacherEmail" placeholder="Email" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <input type="password" id="teacherPassword" placeholder="Password" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" required>
+                        <button type="submit" class="bg-red-500 text-white font-semibold py-2 rounded-lg hover:bg-red-600 transition">Add Teacher</button>
+                    </form>
+                    <div id="teacherFormMessage" class="mt-4 hidden p-3 rounded-lg text-sm"></div>
+                </div>
+
+                <!-- Teachers Table -->
+                <div id="teacherLoadingMessage" class="text-center py-12">
+                    <div class="inline-block">
+                        <div class="animate-spin inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
+                        <p class="mt-4 text-gray-600">Loading teachers...</p>
+                    </div>
+                </div>
+
+                <div id="teachersTableContainer" class="overflow-x-auto hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Teacher ID</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Subject</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachersTableBody" class="border-b border-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No teachers found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Results Tab -->
+            <div id="resultsTab" class="p-8 hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">All Student Results</h2>
+                
+                <div id="resultsLoadingMessage" class="text-center py-12">
+                    <div class="inline-block">
+                        <div class="animate-spin inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
+                        <p class="mt-4 text-gray-600">Loading results...</p>
+                    </div>
+                </div>
+
+                <div id="resultsTableContainer" class="overflow-x-auto hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Roll No</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Class</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Total Marks</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Percentage</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody" class="border-b border-gray-200">
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No results found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Subjects Tab -->
+            <div id="subjectsTab" class="p-8 hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">All Subjects</h2>
+                
+                <div id="subjectsLoadingMessage" class="text-center py-12">
+                    <div class="inline-block">
+                        <div class="animate-spin inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
+                        <p class="mt-4 text-gray-600">Loading subjects...</p>
+                    </div>
+                </div>
+
+                <div id="subjectsTableContainer" class="overflow-x-auto hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Subject Name</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Code</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Max Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subjectsTableBody" class="border-b border-gray-200">
+                            <tr>
+                                <td colspan="3" class="px-6 py-4 text-center text-gray-500">No subjects found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const adminId = localStorage.getItem('adminId');
+            const adminName = localStorage.getItem('adminName');
+
+            if (!adminId) {
+                window.location.href = 'admin_login.html';
+                return;
+            }
+
+            document.getElementById('adminInfo').textContent = adminName;
+            document.getElementById('adminName').textContent = `Welcome, ${adminName}!`;
+
+            // Load initial data
+            fetchStudents();
+            fetchTeachers();
+            fetchResults();
+            fetchSubjects();
+        });
+
+        async function fetchStudents() {
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/students');
+                const data = await response.json();
+
+                document.getElementById('studentLoadingMessage').classList.add('hidden');
+
+                if (data.success && data.students.length > 0) {
+                    const tableBody = document.getElementById('studentsTableBody');
+                    tableBody.innerHTML = '';
+
+                    data.students.forEach(student => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-200 hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-800 font-medium">${student.roll_no}</td>
+                            <td class="px-6 py-4 text-gray-600">${student.name}</td>
+                            <td class="px-6 py-4 text-gray-600">${student.class}</td>
+                            <td class="px-6 py-4 text-gray-600">${student.email}</td>
+                            <td class="px-6 py-4">
+                                <button onclick="deleteStudent(${student.id})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    document.getElementById('studentsTableContainer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching students:', error);
+                document.getElementById('studentLoadingMessage').classList.add('hidden');
+            }
+        }
+
+        async function fetchTeachers() {
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/teachers');
+                const data = await response.json();
+
+                document.getElementById('teacherLoadingMessage').classList.add('hidden');
+
+                if (data.success && data.teachers.length > 0) {
+                    const tableBody = document.getElementById('teachersTableBody');
+                    tableBody.innerHTML = '';
+
+                    data.teachers.forEach(teacher => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-200 hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-800 font-medium">${teacher.teacher_id}</td>
+                            <td class="px-6 py-4 text-gray-600">${teacher.name}</td>
+                            <td class="px-6 py-4 text-gray-600">${teacher.subject}</td>
+                            <td class="px-6 py-4 text-gray-600">${teacher.email}</td>
+                            <td class="px-6 py-4">
+                                <button onclick="deleteTeacher(${teacher.id})" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    document.getElementById('teachersTableContainer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching teachers:', error);
+                document.getElementById('teacherLoadingMessage').classList.add('hidden');
+            }
+        }
+
+        async function fetchResults() {
+            try {
+                const response = await fetch('http://localhost:5000/api/admin/all-results');
+                const data = await response.json();
+
+                document.getElementById('resultsLoadingMessage').classList.add('hidden');
+
+                if (data.success && data.results.length > 0) {
+                    const tableBody = document.getElementById('resultsTableBody');
+                    tableBody.innerHTML = '';
+
+                    data.results.forEach(result => {
+                        const statusClass = result.status === 'Pass' ? 'text-green-600' : 'text-red-600';
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-200 hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-800 font-medium">${result.roll_no}</td>
+                            <td class="px-6 py-4 text-gray-600">${result.name}</td>
+                            <td class="px-6 py-4 text-gray-600">${result.class}</td>
+                            <td class="px-6 py-4 text-gray-600 font-semibold">${result.total_marks}/${result.max_marks}</td>
+                            <td class="px-6 py-4 text-gray-600 font-semibold">${result.percentage}%</td>
+                            <td class="px-6 py-4 font-semibold ${statusClass}">${result.status}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    document.getElementById('resultsTableContainer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching results:', error);
+                document.getElementById('resultsLoadingMessage').classList.add('hidden');
+            }
+        }
+
+        async function fetchSubjects() {
+            try {
+                const response = await fetch('http://localhost:5000/api/subjects');
+                const data = await response.json();
+
+                document.getElementById('subjectsLoadingMessage').classList.add('hidden');
+
+                if (data.success && data.subjects.length > 0) {
+                    const tableBody = document.getElementById('subjectsTableBody');
+                    tableBody.innerHTML = '';
+
+                    data.subjects.forEach(subject => {
+                        const row = document.createElement('tr');
+                        row.className = 'border-b border-gray-200 hover:bg-gray-50';
+                        row.innerHTML = `
+                            <td class="px-6 py-4 text-gray-800 font-medium">${subject.name}</td>
+                            <td class="px-6 py-4 text-gray-600">${subject.code}</td>
+                            <td class="px-6 py-4 text-gray-600">${subject.max_marks}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    document.getElementById('subjectsTableContainer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error fetching subjects:', error);
+                document.getElementById('subjectsLoadingMessage').classList.add('hidden');
+            }
+        }
+
+        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const response = await fetch('http://localhost:5000/api/admin/add-student', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    roll_no: document.getElementById('rollNo').value,
+                    name: document.getElementById('studentName').value,
+                    class_name: document.getElementById('className').value,
+                    email: document.getElementById('studentEmail').value,
+                    password: document.getElementById('studentPassword').value
+                })
+            });
+
+            const data = await response.json();
+            const msg = document.getElementById('studentFormMessage');
+
+            if (data.success) {
+                msg.textContent = data.message;
+                msg.className = 'bg-green-50 border border-green-200 text-green-600';
+                document.getElementById('addStudentForm').reset();
+                setTimeout(() => { msg.classList.add('hidden'); fetchStudents(); }, 2000);
+            } else {
+                msg.textContent = data.message;
+                msg.className = 'bg-red-50 border border-red-200 text-red-600';
+            }
+            msg.classList.remove('hidden');
+        });
+
+        document.getElementById('addTeacherForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const response = await fetch('http://localhost:5000/api/admin/add-teacher', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    teacher_id: document.getElementById('teacherId').value,
+                    name: document.getElementById('teacherName').value,
+                    subject: document.getElementById('subject').value,
+                    email: document.getElementById('teacherEmail').value,
+                    password: document.getElementById('teacherPassword').value
+                })
+            });
+
+            const data = await response.json();
+            const msg = document.getElementById('teacherFormMessage');
+
+            if (data.success) {
+                msg.textContent = data.message;
+                msg.className = 'bg-green-50 border border-green-200 text-green-600';
+                document.getElementById('addTeacherForm').reset();
+                setTimeout(() => { msg.classList.add('hidden'); fetchTeachers(); }, 2000);
+            } else {
+                msg.textContent = data.message;
+                msg.className = 'bg-red-50 border border-red-200 text-red-600';
+            }
+            msg.classList.remove('hidden');
+        });
+
+        async function deleteStudent(studentId) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                const response = await fetch(`http://localhost:5000/api/admin/delete-student/${studentId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    fetchStudents();
+                }
+            }
+        }
+
+        async function deleteTeacher(teacherId) {
+            if (confirm('Are you sure you want to delete this teacher?')) {
+                const response = await fetch(`http://localhost:5000/api/admin/delete-teacher/${teacherId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    fetchTeachers();
+                }
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('[id$="Tab"]').forEach(tab => tab.classList.add('hidden'));
+            document.getElementById(tabName + 'Tab').classList.remove('hidden');
+
+            document.querySelectorAll('[onclick*="showTab"]').forEach(btn => {
+                btn.classList.remove('bg-red-50', 'border-b-2', 'border-red-600');
+            });
+            event.target.classList.add('bg-red-50', 'border-b-2', 'border-red-600');
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'admin_login.html';
+        }
+    </script>
+</body>
+</html>

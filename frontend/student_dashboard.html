@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Result Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="index.html" class="text-2xl font-bold">📚 RMS</a>
+                <div class="flex items-center space-x-4">
+                    <span id="studentInfo" class="text-sm"></span>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-semibold transition">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Student Info Card -->
+        <div class="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg shadow-lg p-8 mb-8">
+            <h1 class="text-3xl font-bold mb-2">Welcome Back!</h1>
+            <p id="studentName" class="text-lg text-green-100">Loading...</p>
+            <p id="studentClass" class="text-sm text-green-100">Class: Loading...</p>
+        </div>
+
+        <!-- Loading Message -->
+        <div id="loadingMessage" class="text-center py-12">
+            <div class="inline-block">
+                <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                <p class="mt-4 text-gray-600">Loading your results...</p>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden bg-red-50 border border-red-200 rounded-lg p-4 mb-8 text-red-600"></div>
+
+        <!-- Results Section -->
+        <div id="resultsContainer" class="hidden">
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-lg p-6 border-t-4 border-blue-600">
+                    <p class="text-gray-600 text-sm font-semibold">Total Marks</p>
+                    <p id="totalMarks" class="text-3xl font-bold text-blue-600">0</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 border-t-4 border-purple-600">
+                    <p class="text-gray-600 text-sm font-semibold">Percentage</p>
+                    <p id="percentage" class="text-3xl font-bold text-purple-600">0%</p>
+                </div>
+                <div class="bg-white rounded-lg shadow-lg p-6 border-t-4 border-yellow-600">
+                    <p class="text-gray-600 text-sm font-semibold">Grade</p>
+                    <p id="grade" class="text-3xl font-bold text-yellow-600">--</p>
+                </div>
+                <div id="statusCard" class="bg-white rounded-lg shadow-lg p-6 border-t-4 border-green-600">
+                    <p class="text-gray-600 text-sm font-semibold">Status</p>
+                    <p id="status" class="text-3xl font-bold text-green-600">--</p>
+                </div>
+            </div>
+
+            <!-- Subject-wise Marks -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="bg-gray-100 border-b border-gray-200 px-6 py-4">
+                    <h2 class="text-2xl font-bold text-gray-800">📖 Subject-Wise Marks</h2>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Subject</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Marks Obtained</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Max Marks</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Percentage</th>
+                                <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="marksTableBody">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No marks found</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        window.addEventListener('load', () => {
+            const studentId = localStorage.getItem('studentId');
+            const studentName = localStorage.getItem('studentName');
+            const rollNo = localStorage.getItem('rollNo');
+            const studentClass = localStorage.getItem('class');
+
+            if (!studentId) {
+                window.location.href = 'student_login.html';
+                return;
+            }
+
+            // Update header
+            document.getElementById('studentInfo').textContent = `${rollNo} - ${studentName}`;
+            document.getElementById('studentName').textContent = `${studentName} (Roll No: ${rollNo})`;
+            document.getElementById('studentClass').textContent = `Class: ${studentClass}`;
+
+            // Fetch results
+            fetchResults(studentId);
+        });
+
+        async function fetchResults(studentId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/student/results/${studentId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                    document.getElementById('loadingMessage').classList.add('hidden');
+                    document.getElementById('resultsContainer').classList.remove('hidden');
+                } else {
+                    showError('No results found yet.');
+                }
+            } catch (error) {
+                showError('Error fetching results. Please try again.');
+                console.error(error);
+            }
+        }
+
+        function displayResults(data) {
+            // Update summary cards
+            document.getElementById('totalMarks').textContent = `${data.total_marks}/${data.max_marks}`;
+            document.getElementById('percentage').textContent = `${data.percentage}%`;
+            document.getElementById('grade').textContent = data.grade;
+            document.getElementById('status').textContent = data.status;
+
+            // Update status card color
+            const statusCard = document.getElementById('statusCard');
+            if (data.status === 'Pass') {
+                statusCard.classList.remove('border-t-4', 'border-red-600');
+                statusCard.classList.add('border-t-4', 'border-green-600');
+                document.getElementById('status').classList.remove('text-red-600');
+                document.getElementById('status').classList.add('text-green-600');
+            } else {
+                statusCard.classList.remove('border-t-4', 'border-green-600');
+                statusCard.classList.add('border-t-4', 'border-red-600');
+                document.getElementById('status').classList.remove('text-green-600');
+                document.getElementById('status').classList.add('text-red-600');
+            }
+
+            // Populate marks table
+            const tableBody = document.getElementById('marksTableBody');
+            tableBody.innerHTML = '';
+
+            data.results.forEach(result => {
+                const percentage = (result.marks / result.max_marks * 100).toFixed(2);
+                const status = percentage >= 40 ? '✓ Pass' : '✗ Fail';
+                const statusClass = percentage >= 40 ? 'text-green-600' : 'text-red-600';
+
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-200 hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-gray-800 font-medium">${result.subject}</td>
+                    <td class="px-6 py-4 text-gray-600">${result.marks}</td>
+                    <td class="px-6 py-4 text-gray-600">${result.max_marks}</td>
+                    <td class="px-6 py-4 text-gray-600 font-semibold">${percentage}%</td>
+                    <td class="px-6 py-4 font-semibold ${statusClass}">${status}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('loadingMessage').classList.add('hidden');
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorMessage').classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('studentId');
+            localStorage.removeItem('studentName');
+            localStorage.removeItem('rollNo');
+            localStorage.removeItem('class');
+            window.location.href = 'student_login.html';
+        }
+    </script>
+</body>
+</html>
